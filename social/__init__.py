@@ -2,43 +2,35 @@ import os
 
 from flask import Flask
 from flask_restful import Api, Resource
+from flask_bcrypt import Bcrypt
 from dotenv import load_dotenv
 
 load_dotenv()  # take environment variables from .env.
+bcrypt = Bcrypt()
+
 
 def create_app(test_config=None):
-    # create and configure the app
-    app = Flask(__name__, instance_relative_config=True)
+    app = Flask(__name__)
+    app.config['DATABASE'] = os.environ.get('DATABASE_URI')
 
-    app.config.from_mapping(
-        SQLALCHEMY_DATABASE_URI=os.environ.get('DATABASE_URI'),
-        SQLALCHEMY_TRACK_MODIFICATIONS=False
-    )
-
-    if test_config is None:
-        # load the instance config when not testing
-        app.config.from_pyfile('config.py', silent=True)
-    else:
-        # load the test config
+    if test_config is not None:
         app.config.from_mapping(test_config)
 
-    # create the instance folder
-    try:
-        os.makedirs(app.instance_path)
-    except OSError:
-        pass
+    # database
+    from . import db
+    db.init_app(app)
 
-    api = Api(app)
+    api = Api(app, catch_all_404s=True)
 
     class Hello(Resource):
         def get(self):
             return {'message': 'hello world'}
 
     # routes
-    api.add_resource(Hello, '/')
+    from .resources.auth import Signup
 
-    # database
-    from . import db
-    db.create_tables(app)
+    api.add_resource(Hello, '/')
+    api.add_resource(Signup, '/auth/signup')
 
     return app
+
