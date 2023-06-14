@@ -1,0 +1,29 @@
+DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS posts;
+DROP TABLE IF EXISTS invitations;
+
+CREATE TABLE users (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  username TEXT UNIQUE NOT NULL,
+  phone_number TEXT NOT NULL,
+  password TEXT NOT NULL
+);
+
+CREATE TABLE posts (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  title TEXT NOT NULL,
+  content TEXT NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  author_id INTEGER NOT NULL,
+  FOREIGN KEY (author_id) REFERENCES users(id)
+);
+
+CREATE TABLE invitations (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  post_id INTEGER NOT NULL,
+  author_id INTEGER NOT NULL,
+  invitee_id INTEGER NOT NULL,
+  FOREIGN KEY (post_id) REFERENCES posts(id),
+  FOREIGN KEY (author_id) REFERENCES users(id),
+  FOREIGN KEY (invitee_id) REFERENCES users(id)
+);

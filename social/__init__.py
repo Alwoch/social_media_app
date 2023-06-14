@@ -11,10 +11,19 @@ bcrypt = Bcrypt()
 
 def create_app(test_config=None):
     app = Flask(__name__)
-    app.config['DATABASE'] = os.environ.get('DATABASE_URI')
+    app.config['DATABASE_URI'] = os.environ['DATABASE_URI']
+
+    app.config.from_mapping(
+        DATABASE=os.path.join(app.instance_path, 'social.sqlite'),
+    )
 
     if test_config is not None:
         app.config.from_mapping(test_config)
+
+    try:
+        os.makedirs(app.instance_path)
+    except OSError:
+        pass
 
     # database
     from . import db

@@ -27,7 +27,7 @@ class UserSchema(Schema):
                           required=True,
                           error_messages={"required": "password is required"},
                           validate=validate.Length(
-                              min=8, max=30, error="password must be between 8 and 30 characters")
+                              min=8, max=255, error="password must be between 8 and 30 characters")
                           )
 
     class Meta:

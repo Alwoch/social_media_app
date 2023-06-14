@@ -1,16 +1,19 @@
-import psycopg2
+import sqlite3
 
 import click
 from flask import current_app, g
 
-#TODO refactor this function
+
 def get_db():
     if 'db' not in g:
-        url=current_app.config['DATABASE']
-        connection=psycopg2.connect(url)
-        cursor=connection.cursor()
+        g.db = sqlite3.connect(
+            current_app.config['DATABASE'],
+            detect_types=sqlite3.PARSE_DECLTYPES
+        )
+        g.db.row_factory = sqlite3.Row
 
-        return g.db
+    return g.db
+
 
 
 def close_db(e=None):
