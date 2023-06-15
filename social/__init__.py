@@ -37,9 +37,11 @@ def create_app(test_config=None):
 
     # routes
     from .resources.auth import Signup
+    from .resources.user import UsersList
 
     api.add_resource(Hello, '/')
     api.add_resource(Signup, '/auth/signup')
+    api.add_resource(UsersList, '/users')
 
     return app
 
