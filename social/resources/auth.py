@@ -1,6 +1,7 @@
 from flask import request
 from flask_restful import Resource
 from marshmallow import ValidationError
+from flask_jwt_extended import create_access_token, set_access_cookies, unset_jwt_cookies
 
 from social.schemas.user import UserSchema
 from social import bcrypt
@@ -35,12 +36,39 @@ class Signup(Resource):
 
         return {"message": "user successfully created"}, 201
 
+
 class Login(Resource):
+    """Login and attach cookies to response"""
     def post(self):
-        db=get_db
-        json_data=request.get_json()
+        db = get_db()
+        json_data = request.get_json()
+        user_schema = UserSchema()
 
         try:
-            data = UserSchema().load(json_data)
+            data = UserSchema().load(json_data, partial=True)
         except ValidationError as err:
             return err.messages, 400
+
+        user = db.execute(find_by_username, (data['username'],)).fetchone()
+
+        if user is None:
+            return {'message': 'user not found'}, 404
+        elif not bcrypt.check_password_hash(user['password'], data['password']):
+            return {'message': 'invalid login credentials'}
+
+        response = {'message': 'you are logged in'}
+        access_token = create_access_token(identity=user_schema.dump(user))
+        set_access_cookies(response, access_token)
+
+        return response, 200
+
+
+class Logout(Resource):
+    """log out and remove token from cooke"""
+
+    def logout():
+        response = {"message": "logged out successfully"}
+        unset_jwt_cookies(response)
+        return response, 200
+
+

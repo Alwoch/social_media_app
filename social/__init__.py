@@ -1,8 +1,10 @@
 import os
+from datetime import timedelta
 
 from flask import Flask
 from flask_restful import Api, Resource
 from flask_bcrypt import Bcrypt
+from flask_jwt_extended import JWTManager
 from dotenv import load_dotenv
 
 load_dotenv()  # take environment variables from .env.
@@ -11,11 +13,15 @@ bcrypt = Bcrypt()
 
 def create_app(test_config=None):
     app = Flask(__name__)
-    app.config['DATABASE_URI'] = os.environ['DATABASE_URI']
 
+    app.config['DATABASE'] = os.path.join(app.instance_path, 'social.sqlite')
     app.config.from_mapping(
-        DATABASE=os.path.join(app.instance_path, 'social.sqlite'),
+        JWT_TOKEN_LOCATION=["cookies"],
+        JWT_COOKIE_SECURE=False,  # TODO Change this to true for production
+        JWT_SECRET_KEY=os.environ['JWT_SECRET_KEY'],
+        JWT_ACCESS_TOKEN_EXPIRES=timedelta(hours=24)
     )
+    jwt = JWTManager(app)
 
     if test_config is not None:
         app.config.from_mapping(test_config)
@@ -31,17 +37,30 @@ def create_app(test_config=None):
 
     api = Api(app, catch_all_404s=True)
 
+    # verify the jwt id in the database
+    from .utils.queries import find_by_id
+    from .db import get_db
+    from .schemas.user import UserSchema
+
+    @jwt.user_lookup_loader
+    def user_lookup_callback(_jwt_header, jwt_data):
+        identity = jwt_data["sub"]
+        db = get_db()
+        user = db.execute(find_by_id, (identity,)).fetchone()
+        return UserSchema().dump(user) if user else None
+
     class Hello(Resource):
         def get(self):
             return {'message': 'hello world'}
 
     # routes
-    from .resources.auth import Signup
+    from .resources.auth import Signup, Login, Logout
     from .resources.user import UsersList
 
     api.add_resource(Hello, '/')
     api.add_resource(Signup, '/auth/signup')
+    api.add_resource(Login, '/auth/login')
+    api.add_resource(Logout, '/auth/logout')
     api.add_resource(UsersList, '/users')
 
     return app
-
