@@ -44,10 +44,20 @@ def create_app(test_config=None):
 
     @jwt.user_lookup_loader
     def user_lookup_callback(_jwt_header, jwt_data):
-        identity = jwt_data["sub"]
+        identity = jwt_data["sub"]['id']
         db = get_db()
         user = db.execute(find_by_id, (identity,)).fetchone()
         return UserSchema().dump(user) if user else None
+
+    # error for when loading the user identity fails eg deleted from the database
+    @jwt.user_lookup_error_loader
+    def user_lookup_error_callback(_jwt_header, jwt_data):
+        return {'msg': 'user not found'}, 404
+
+    # return custom message when not logged in
+    @jwt.unauthorized_loader
+    def unauthorized_callback(reason):
+        return {'msg': 'please log in to access this route'}, 401
 
     class Hello(Resource):
         def get(self):
@@ -55,12 +65,13 @@ def create_app(test_config=None):
 
     # routes
     from .resources.auth import Signup, Login, Logout
-    from .resources.user import UsersList
+    from .resources.user import UsersList, User
 
     api.add_resource(Hello, '/')
     api.add_resource(Signup, '/auth/signup')
     api.add_resource(Login, '/auth/login')
     api.add_resource(Logout, '/auth/logout')
     api.add_resource(UsersList, '/users')
+    api.add_resource(User, '/user')
 
     return app

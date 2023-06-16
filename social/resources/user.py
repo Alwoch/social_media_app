@@ -1,4 +1,6 @@
 from flask_restful import Resource
+from flask_jwt_extended import jwt_required, current_user
+
 from social.db import get_db
 from social.utils.queries import fetch_all_users
 from social.schemas.user import UserSchema
@@ -16,3 +18,10 @@ class UsersList(Resource):
         users = user_schema.dump(result, many=True)
 
         return users, 200
+
+
+class User(Resource):
+    """get the current logged in user"""
+    @jwt_required()
+    def get(self):
+        return current_user

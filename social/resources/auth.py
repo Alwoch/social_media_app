@@ -1,4 +1,4 @@
-from flask import request
+from flask import request, jsonify
 from flask_restful import Resource
 from marshmallow import ValidationError
 from flask_jwt_extended import create_access_token, set_access_cookies, unset_jwt_cookies
@@ -39,6 +39,7 @@ class Signup(Resource):
 
 class Login(Resource):
     """Login and attach cookies to response"""
+
     def post(self):
         db = get_db()
         json_data = request.get_json()
@@ -56,19 +57,18 @@ class Login(Resource):
         elif not bcrypt.check_password_hash(user['password'], data['password']):
             return {'message': 'invalid login credentials'}
 
-        response = {'message': 'you are logged in'}
-        access_token = create_access_token(identity=user_schema.dump(user))
+        serialised_user=UserSchema().dump(user)
+        response = jsonify({'message': 'you are logged in'})
+        access_token = create_access_token(identity=serialised_user)
         set_access_cookies(response, access_token)
 
-        return response, 200
+        return response
 
 
 class Logout(Resource):
     """log out and remove token from cooke"""
 
-    def logout():
-        response = {"message": "logged out successfully"}
+    def get(self):
+        response = jsonify({"message": "logged out successfully"})
         unset_jwt_cookies(response)
-        return response, 200
-
-
+        return response
