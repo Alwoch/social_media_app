@@ -15,7 +15,7 @@ CREATE TABLE posts (
   content TEXT NOT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   author_id INTEGER NOT NULL,
-  FOREIGN KEY (author_id) REFERENCES users(id)
+  FOREIGN KEY (author_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE invitations (
@@ -23,7 +23,7 @@ CREATE TABLE invitations (
   post_id INTEGER NOT NULL,
   author_id INTEGER NOT NULL,
   invitee_id INTEGER NOT NULL,
-  FOREIGN KEY (post_id) REFERENCES posts(id),
-  FOREIGN KEY (author_id) REFERENCES users(id),
-  FOREIGN KEY (invitee_id) REFERENCES users(id)
+  FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,
+  FOREIGN KEY (author_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (invitee_id) REFERENCES users(id) ON DELETE CASCADE
 );

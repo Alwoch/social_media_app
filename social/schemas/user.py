@@ -9,7 +9,7 @@ class UserSchema(Schema):
     -make fields required
     -exclude unknown fields
     """
-    id = fields.UUID(dump_only=True)
+    id = fields.Int(dump_only=True)
     username = fields.Str(required=True,
                           error_messages={
                               "required": "please provide username",

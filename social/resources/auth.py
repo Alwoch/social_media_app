@@ -1,4 +1,4 @@
-from flask import request, jsonify
+from flask import request, jsonify, abort
 from flask_restful import Resource
 from marshmallow import ValidationError
 from flask_jwt_extended import create_access_token, set_access_cookies, unset_jwt_cookies
@@ -24,7 +24,7 @@ class Signup(Resource):
             find_by_username, (data["username"],)).fetchone()
 
         if existing_user is not None:
-            return {"message": "username already exists"}, 409
+            abort(400, description="user already exists")
 
         # save the user
         db.execute(create_user, (
@@ -46,16 +46,16 @@ class Login(Resource):
         user_schema = UserSchema()
 
         try:
-            data = UserSchema().load(json_data, partial=True)
+            data = user_schema.load(json_data, partial=True)
         except ValidationError as err:
             return err.messages, 400
 
         user = db.execute(find_by_username, (data['username'],)).fetchone()
 
         if user is None:
-            return {'message': 'user not found'}, 404
+            abort(404, description="user not found")
         elif not bcrypt.check_password_hash(user['password'], data['password']):
-            return {'message': 'invalid login credentials'}
+            abort(400, description="invalid login credentials")
 
         serialised_user=UserSchema().dump(user)
         response = jsonify({'message': 'you are logged in'})
