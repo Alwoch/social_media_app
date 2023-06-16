@@ -23,12 +23,13 @@ class UsersList(Resource):
 #TODO -Delete route
 #TODO -update route
 #TODO -paginate users
-class User(Resource):
+class LoggedInUser(Resource):
     """get the current logged in user"""
     @jwt_required()
     def get(self):
         return current_user
     
+class User(Resource):
     @requires_account_owner()
     def get(self,user_id):
         return {'msg':'safe'}

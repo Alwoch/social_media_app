@@ -11,7 +11,7 @@ def requires_account_owner():
         def decorator(*args, **kwargs):
             verify_jwt_in_request()
 
-            if int(current_user['id']) == kwargs['user_id']:
+            if current_user['id'] == kwargs['user_id']:
                 return fn(*args, **kwargs)
             else:
                 abort(403, description="unable to perform action")

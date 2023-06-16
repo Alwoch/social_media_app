@@ -1,3 +1,5 @@
+import uuid
+
 from flask import request, jsonify, abort
 from flask_restful import Resource
 from marshmallow import ValidationError
@@ -27,7 +29,9 @@ class Signup(Resource):
             abort(400, description="user already exists")
 
         # save the user
+        user_id=uuid.uuid4()
         db.execute(create_user, (
+            str(user_id),
             data['username'],
             data['phone_number'],
             bcrypt.generate_password_hash(data['password']).decode('utf-8')

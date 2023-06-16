@@ -1,3 +1,5 @@
+import uuid
+
 from flask import abort, request
 
 from flask_restful import Resource
@@ -6,7 +8,7 @@ from marshmallow import ValidationError
 
 from social.db import get_db
 from social.schemas.post import PostSchema
-from social.utils.queries import create_post
+from social.utils.queries import create_post, get_posts_by_author_id
 
 
 class Post(Resource):
@@ -15,16 +17,30 @@ class Post(Resource):
     def post(self):
         db = get_db()
         json_data = request.get_json()
-        print(json_data)
 
         # validate and serialize
         try:
             data = PostSchema().load(json_data)
-            print(data)
         except ValidationError as e:
             return e.messages, 400
 
-        post=db.execute(create_post,
-                   (data['title'], data['content'], current_user['id']))
+        new_post_id=uuid.uuid4()
+        db.execute(create_post,
+                   (str(new_post_id),data['title'], data['content'], current_user['id']))
+        db.commit()
 
-        return PostSchema.dump(post),201
+        return {'msg': 'post successfully created'}, 201
+
+    """user gets own posts"""
+    # TODO add pagination to this
+    @jwt_required()
+    def get(self):
+        db = get_db()
+
+        rows = db.execute(get_posts_by_author_id,
+                          (current_user['id'],)).fetchall()
+
+        result = [dict(row) for row in rows]
+        posts = PostSchema().dump(result, many=True)
+
+        return posts, 200
