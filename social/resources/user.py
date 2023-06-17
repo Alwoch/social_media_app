@@ -1,3 +1,5 @@
+from flask import request
+
 from flask_restful import Resource
 from flask_jwt_extended import jwt_required, current_user
 
@@ -7,29 +9,35 @@ from social.schemas.user import UserSchema
 from social.utils.decorators import requires_account_owner
 
 
-# TODO: refactor get all users to include pagination
-
 class UsersList(Resource):
+    """list all users with pagination"""
     def get(self):
+        page_number = request.args.get('page', default=1, type=int)
+        limit = request.args.get('users', default=10, type=int)
+        offset = (page_number-1)*limit
+
         db = get_db()
         user_schema = UserSchema()
 
-        rows = db.execute(fetch_all_users).fetchall()
+        rows = db.execute(fetch_all_users, (limit, offset)).fetchall()
         result = [dict(row) for row in rows]
         users = user_schema.dump(result, many=True)
 
-        return users, 200
+        return {'count': len(users), 'users': users}, 200
 
-#TODO -Delete route
-#TODO -update route
-#TODO -paginate users
+# TODO -Delete route
+# TODO -update route
+# TODO -paginate users
+
+
 class LoggedInUser(Resource):
     """get the current logged in user"""
     @jwt_required()
     def get(self):
         return current_user
-    
+
+
 class User(Resource):
     @requires_account_owner()
-    def get(self,user_id):
-        return {'msg':'safe'}
+    def get(self, user_id):
+        return {'msg': 'safe'}

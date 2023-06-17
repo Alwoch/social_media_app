@@ -20,10 +20,10 @@ CREATE TABLE posts (
 
 CREATE TABLE invitations (
   id TEXT PRIMARY KEY,
-  post_id INTEGER NOT NULL,
-  author_id INTEGER NOT NULL,
-  invitee_id INTEGER NOT NULL,
+  post_id TEXT NOT NULL,
+  author_id TEXT NOT NULL,
+  invitee TEXT NOT NULL,
   FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,
   FOREIGN KEY (author_id) REFERENCES users(id) ON DELETE CASCADE,
-  FOREIGN KEY (invitee_id) REFERENCES users(id) ON DELETE CASCADE
+  FOREIGN KEY (invitee) REFERENCES users(username) ON DELETE CASCADE
 );
