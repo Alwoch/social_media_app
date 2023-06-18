@@ -25,7 +25,25 @@ class UserSchema(Schema):
                               )
     password = fields.Str(load_only=True,
                           required=True,
-                          error_messages={"required": "please provide password"},
+                          error_messages={
+                              "required": "please provide password"},
+                          validate=validate.Length(
+                              min=8, max=255, error="password must be between 8 and 30 characters")
+                          )
+
+    class Meta:
+        unknown = EXCLUDE
+        ordered = True
+
+
+class UpdateUserSchema(Schema):
+    id = fields.UUID(dump_only=True)
+    phone_number = fields.Str(required=True,
+                              validate=validate.Length(
+                                  10, error="please enter a valid phone number")
+                              )
+    password = fields.Str(load_only=True,
+                          required=True,
                           validate=validate.Length(
                               min=8, max=255, error="password must be between 8 and 30 characters")
                           )

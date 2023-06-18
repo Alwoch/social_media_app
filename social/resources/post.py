@@ -8,10 +8,11 @@ from marshmallow import ValidationError
 
 from social.db import get_db
 from social.schemas.post import PostSchema
-from social.utils.queries import create_post, get_posts_by_author_id
+from social.utils.queries import create_post, get_posts_by_author_id, update_post, delete_post
+from social.utils.decorators import requires_post_owner
 
 
-class Post(Resource):
+class PostList(Resource):
     """create post"""
     @jwt_required()
     def post(self):
@@ -47,3 +48,48 @@ class Post(Resource):
         posts = PostSchema().dump(result, many=True)
 
         return {'count': len(posts), 'posts': posts}, 200
+
+
+class Post(Resource):
+    """update a post"""
+    @requires_post_owner()
+    def patch(self, post_id):
+        db = get_db()
+        json_data = request.get_json()
+
+        # validate and serialize
+        try:
+            data = PostSchema().load(json_data, partial=True)
+        except ValidationError as e:
+            return e.messages, 400
+
+        update_post_query = update_post
+        update_post_params = []
+
+        for field in data:
+            if data[field] is not None:
+                update_post_query += f' {field} =?,'
+                update_post_params.append(data[field])
+
+        # update for parameters provided
+        if len(update_post_params) > 0:
+            update_post_query = update_post_query[:-1]  # remove trailing comma
+            update_post_query += f' WHERE id=?'
+            update_post_params.append(post_id)
+
+            # save updated data
+            db.execute(update_post_query, update_post_params)
+            db.commit()
+
+            return {'msg': 'post successfully updated'}, 200
+        else:
+            return {'msg': 'no new changes provided'}
+
+    @requires_post_owner()
+    def delete(self, post_id):
+        db = get_db()
+
+        db.execute(delete_post, (post_id,))
+        db.commit()
+
+        return {'msg': 'post has been successfully deleted'}, 200

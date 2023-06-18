@@ -66,7 +66,7 @@ def create_app(test_config=None):
     # routes
     from .resources.auth import Signup, Login, Logout
     from .resources.user import UsersList, User, LoggedInUser
-    from .resources.post import Post
+    from .resources.post import Post, PostList
 
     api.add_resource(Hello, '/')
     api.add_resource(Signup, '/auth/signup')
@@ -75,6 +75,7 @@ def create_app(test_config=None):
     api.add_resource(UsersList, '/users')
     api.add_resource(LoggedInUser, '/users/me')
     api.add_resource(User, '/users/<string:user_id>')
-    api.add_resource(Post, '/posts')
+    api.add_resource(Post, '/posts/<string:post_id>')
+    api.add_resource(PostList, '/posts')
 
     return app
