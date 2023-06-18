@@ -1,10 +1,12 @@
 import os
+from datetime import datetime
+from datetime import timezone
 from datetime import timedelta
 
 from flask import Flask
 from flask_restful import Api, Resource
 from flask_bcrypt import Bcrypt
-from flask_jwt_extended import JWTManager
+from flask_jwt_extended import JWTManager, get_jwt, create_access_token, get_jwt_identity, set_access_cookies
 from dotenv import load_dotenv
 
 load_dotenv()  # take environment variables from .env.
@@ -21,12 +23,27 @@ def create_app(test_config=None):
         JWT_SECRET_KEY=os.environ['JWT_SECRET_KEY'],
         JWT_ACCESS_TOKEN_EXPIRES=timedelta(hours=24)
     )
+    
     jwt = JWTManager(app)
+
+    # refresh tokens that are within 30 minutes of expiry
+    @app.after_request
+    def refresh_expiring_jwts(response):
+        try:
+            exp_timestamp = get_jwt()["exp"]
+            now = datetime.now(timezone.utc)
+            target_timestamp = datetime.timestamp(now + timedelta(minutes=30))
+            if target_timestamp > exp_timestamp:
+                access_token = create_access_token(identity=get_jwt_identity())
+                set_access_cookies(response, access_token)
+            return response
+        except (RuntimeError, KeyError):
+            # return the original response where there is no valid JWT
+            return response
 
     if test_config is not None:
         app.config.from_mapping(test_config)
 
-    #TODO remove this if db is changed to postgres
     try:
         os.makedirs(app.instance_path)
     except OSError:

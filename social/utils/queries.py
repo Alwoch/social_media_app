@@ -19,23 +19,17 @@ get_invite = 'SELECT * from invitations WHERE invitee=? AND post_id=?'
 create_invite = 'INSERT INTO invitations (id,post_id,author_id,invitee) VALUES(?,?,?,?)'
 revoke_invite = 'DELETE FROM invitations WHERE invitee=? AND post_id=?'
 
-get_user_post = """`SELECT 
-       *
-	FROM invitations
-    JOIN posts ON invitations.post_id = posts.id 
-    where invitations.post_id = ?
-    AND invitations.invitee_id = ?`"""
+# get_user_post = """`SELECT 
+#        *
+# 	FROM invitations
+#     JOIN posts ON invitations.post_id = posts.id 
+#     where invitations.post_id = ?
+#     AND invitations.invitee_id = ?`"""
 
-get_all_posts = """`SELECT 
-       *
-	FROM invitations
-    JOIN posts ON invitations.post_id = posts.id 
-    WHERE invitations.invitee_id = ? OFFSET 0 LIMIT 10`"""
+# get_all_posts = """`SELECT 
+#        *
+# 	FROM invitations
+#     JOIN posts ON invitations.post_id = posts.id 
+#     WHERE invitations.invitee_id = ? OFFSET 0 LIMIT 10`"""
 
-pagination = """SELECT 
-       *
-	FROM invitations
-    JOIN posts ON invitations.post_id = posts.id 
-    where invitations.post_id = ?
-    AND invitations.invitee_id = ?
-     LIMIT 100 OFFSET ?"""
+
