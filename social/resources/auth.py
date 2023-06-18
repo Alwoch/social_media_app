@@ -3,7 +3,7 @@ import uuid
 from flask import request, jsonify, abort
 from flask_restful import Resource
 from marshmallow import ValidationError
-from flask_jwt_extended import create_access_token, set_access_cookies, unset_jwt_cookies
+from flask_jwt_extended import create_access_token, set_access_cookies, unset_jwt_cookies,jwt_required
 
 from social.schemas.user import UserSchema
 from social import bcrypt
@@ -71,7 +71,7 @@ class Login(Resource):
 
 class Logout(Resource):
     """log out and remove token from cooke"""
-
+    @jwt_required()
     def get(self):
         response = jsonify({"message": "logged out successfully"})
         unset_jwt_cookies(response)

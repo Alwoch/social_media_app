@@ -26,6 +26,7 @@ def create_app(test_config=None):
     if test_config is not None:
         app.config.from_mapping(test_config)
 
+    #TODO remove this if db is changed to postgres
     try:
         os.makedirs(app.instance_path)
     except OSError:
@@ -67,15 +68,21 @@ def create_app(test_config=None):
     from .resources.auth import Signup, Login, Logout
     from .resources.user import UsersList, User, LoggedInUser
     from .resources.post import Post, PostList
+    from .resources.invite import Invite
 
     api.add_resource(Hello, '/')
     api.add_resource(Signup, '/auth/signup')
     api.add_resource(Login, '/auth/login')
     api.add_resource(Logout, '/auth/logout')
+
     api.add_resource(UsersList, '/users')
     api.add_resource(LoggedInUser, '/users/me')
     api.add_resource(User, '/users/<string:user_id>')
+
     api.add_resource(Post, '/posts/<string:post_id>')
     api.add_resource(PostList, '/posts')
+
+    api.add_resource(
+        Invite, '/post/<string:post_id>/invite/<string:user_name>')
 
     return app
