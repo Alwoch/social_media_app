@@ -17,6 +17,9 @@ def create_app(test_config=None):
     app = Flask(__name__)
 
     app.config['DATABASE'] = os.path.join(app.instance_path, 'social.sqlite')
+    app.config['SECRET_KEY'] = os.environ['SECRET_KEY']
+
+    #jwt configurations
     app.config.from_mapping(
         JWT_TOKEN_LOCATION=["cookies"],
         JWT_COOKIE_SECURE=False,  # TODO Change this to true for production
