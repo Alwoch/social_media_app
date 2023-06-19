@@ -1,4 +1,11 @@
-# zofi_assignment
-[postgresql assignment](https://www.postgresqltutorial.com/postgresql-python/connect/)
-[postgres still...](https://pysql.tecladocode.com/section05/lectures/04_psycopg2_vs_psycopg2-binary/)
-[postgres uuids](https://www.postgresqltutorial.com/postgresql-tutorial/postgresql-uuid/?ref=arctype.com)
+# Packages used
+- flask-restful 
+- Marshmallow -serialization and deserialization
+- flask-jwt-extended -jwt authorization
+- flask-bcrypt -password hashing
+  
+# Database
+- sqlite3
+
+# Start the app in development
+- `flask --app social run --debug`

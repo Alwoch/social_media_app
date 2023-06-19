@@ -42,7 +42,7 @@ class User(Resource):
         db = get_db()
         json_data = request.get_json()
 
-        # validate and serialize
+        # validate and deserialize
         try:
             data = UpdateUserSchema().load(json_data, partial=True)
         except ValidationError as e:

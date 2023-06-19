@@ -23,6 +23,7 @@ class Signup(Resource):
         except ValidationError as err:
             return err.messages, 400
 
+        #check for existing username
         existing_user = find_user_by_username(data['username'])
 
         if existing_user is not None:
@@ -45,7 +46,6 @@ class Login(Resource):
     """Login and attach cookies to response"""
 
     def post(self):
-        db = get_db()
         json_data = request.get_json()
         user_schema = UserSchema()
 
@@ -54,6 +54,7 @@ class Login(Resource):
         except ValidationError as err:
             return err.messages, 400
 
+        #check for the user in the database
         user = find_user_by_username(data['username'])
 
         if user is None:
@@ -61,6 +62,7 @@ class Login(Resource):
         elif not bcrypt.check_password_hash(user['password'], data['password']):
             abort(400, description="invalid login credentials")
 
+        #generate access token and save it in cookies
         serialised_user = UserSchema().dump(user)
         response = jsonify({'message': 'you are logged in'})
         access_token = create_access_token(identity=serialised_user)

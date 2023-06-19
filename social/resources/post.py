@@ -8,7 +8,7 @@ from marshmallow import ValidationError
 
 from social.db import get_db
 from social.schemas.post import PostSchema
-from social.utils.queries import create_post, get_posts_by_author_id, update_post, delete_post
+from social.utils.queries import create_post, get_posts_by_author_id, update_post, delete_post,get_feed
 from social.utils.decorators import requires_post_owner
 
 
@@ -19,7 +19,7 @@ class PostList(Resource):
         db = get_db()
         json_data = request.get_json()
 
-        # validate and serialize
+        # validate and deserialize
         try:
             data = PostSchema().load(json_data)
         except ValidationError as e:
@@ -57,7 +57,7 @@ class Post(Resource):
         db = get_db()
         json_data = request.get_json()
 
-        # validate and serialize
+        # validate and deserialize
         try:
             data = PostSchema().load(json_data, partial=True)
         except ValidationError as e:
@@ -66,6 +66,7 @@ class Post(Resource):
         update_post_query = update_post
         update_post_params = []
 
+        #check for non empty fields and add them to the post_params
         for field in data:
             if data[field] is not None:
                 update_post_query += f' {field} =?,'
@@ -85,6 +86,7 @@ class Post(Resource):
         else:
             return {'msg': 'no new changes provided'}
 
+    """logged in user deletes their post"""
     @requires_post_owner()
     def delete(self, post_id):
         db = get_db()
@@ -93,3 +95,22 @@ class Post(Resource):
         db.commit()
 
         return {'msg': 'post has been successfully deleted'}, 200
+
+
+class PostsFeed(Resource):
+    """generate a list of posts to whoch the logged in user is invited"""
+    @jwt_required()
+    def get(self):
+        page_number = request.args.get('page', default=1, type=int)
+        limit = request.args.get('posts', default=10, type=int)
+        offset = (page_number-1)*limit
+
+        db = get_db()
+
+        rows = db.execute(get_feed,
+                          (current_user['id'], limit, offset)).fetchall()
+
+        result = [dict(row) for row in rows]
+        posts = PostSchema().dump(result, many=True)
+
+        return {'count': len(posts), 'posts': posts}, 200

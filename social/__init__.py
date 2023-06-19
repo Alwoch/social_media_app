@@ -67,7 +67,7 @@ def create_app(test_config=None):
         user = db.execute(find_by_id, (identity,)).fetchone()
         return UserSchema().dump(user) if user else None
 
-    # error for when loading the user identity fails eg deleted from the database
+    # error for when loading the user identity fails eg user deleted from the database
     @jwt.user_lookup_error_loader
     def user_lookup_error_callback(_jwt_header, jwt_data):
         return {'msg': 'user not found'}, 404
@@ -84,7 +84,7 @@ def create_app(test_config=None):
     # routes
     from .resources.auth import Signup, Login, Logout
     from .resources.user import UsersList, User, LoggedInUser
-    from .resources.post import Post, PostList
+    from .resources.post import Post, PostList,PostsFeed
     from .resources.invite import Invite
 
     api.add_resource(Hello, '/')
@@ -98,6 +98,7 @@ def create_app(test_config=None):
 
     api.add_resource(Post, '/posts/<string:post_id>')
     api.add_resource(PostList, '/posts')
+    api.add_resource(PostsFeed, '/posts/feed')
 
     api.add_resource(
         Invite, '/post/<string:post_id>/invite/<string:user_name>')
