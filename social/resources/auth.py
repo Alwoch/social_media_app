@@ -13,6 +13,12 @@ from social.utils.queries import find_by_username, create_user
 
 
 class Signup(Resource):
+    # TODO: ADD DOCUSTRINGS FOR ALL CLASSES AND METHODS. DOCUMENTATION IS IMPORTANT
+    # TODO: WHAT THE CLASS DOES, WHAT THE METHOD DOES, WHAT THE ENDPOINT DOES
+    # TODO: ADD VALIDATION TO ALL ENDPOINTS
+    # TODO: ADD DOCSTRING TO ALL ENDPOINTS
+    # TODO: ADD PARAMETER TYPES TO ALL ENDPOINTS DOCUMENTATION
+    # TODO: ADD RETURN TYPES TO ALL ENDPOINTS DOCUMENTATION
     def post(self):
         db = get_db()
         json_data = request.get_json()
@@ -27,7 +33,7 @@ class Signup(Resource):
         existing_user = find_user_by_username(data['username'])
 
         if existing_user is not None:
-            abort(400, description="username already exists")
+            abort(400, description="username already exists") # TODO: WHY NOT RETURN EXCEPTION RATHER THAN ABORT
 
         # save the user
         user_id = uuid.uuid4()
@@ -43,6 +49,12 @@ class Signup(Resource):
 
 
 class Login(Resource):
+    # TODO: ADD DOCUSTRINGS FOR ALL CLASSES AND METHODS. DOCUMENTATION IS IMPORTANT
+    # TODO: WHAT THE CLASS DOES, WHAT THE METHOD DOES, WHAT THE ENDPOINT DOES
+    # TODO: ADD VALIDATION TO ALL ENDPOINTS
+    # TODO: ADD DOCSTRING TO ALL ENDPOINTS
+    # TODO: ADD PARAMETER TYPES TO ALL ENDPOINTS DOCUMENTATION
+    # TODO: ADD RETURN TYPES TO ALL ENDPOINTS DOCUMENTATION
     """Login and attach cookies to response"""
 
     def post(self):
@@ -72,6 +84,12 @@ class Login(Resource):
 
 
 class Logout(Resource):
+    # TODO: ADD DOCUSTRINGS FOR ALL CLASSES AND METHODS. DOCUMENTATION IS IMPORTANT
+    # TODO: WHAT THE CLASS DOES, WHAT THE METHOD DOES, WHAT THE ENDPOINT DOES
+    # TODO: ADD VALIDATION TO ALL ENDPOINTS
+    # TODO: ADD DOCSTRING TO ALL ENDPOINTS
+    # TODO: ADD PARAMETER TYPES TO ALL ENDPOINTS DOCUMENTATION
+    # TODO: ADD RETURN TYPES TO ALL ENDPOINTS DOCUMENTATION
     """log out and remove token from cooke"""
     @jwt_required()
     def get(self):

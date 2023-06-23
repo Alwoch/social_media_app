@@ -1,5 +1,5 @@
 # user
-find_by_username = 'SELECT * FROM users WHERE username = ?'
+find_by_username = 'SELECT * FROM users WHERE username = ?' # TODO: DOCUMENT THIS QUERY AND THE REST OF THE QUERIES
 create_user = 'INSERT INTO users (id,username,phone_number,password) VALUES (?,?,?,?)'
 fetch_all_users = 'SELECT * FROM users LIMIT ? OFFSET ?'
 find_by_id = 'SELECT * FROM users WHERE id = ?'
