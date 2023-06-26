@@ -38,7 +38,7 @@ class Invite(Resource):
 
         return {'msg': f'{user_name} has been invited to this post'}, 201
 
-    """revoke invite"""
+    """accepts a post_id and username to revoke an invite"""
     @requires_post_owner()
     def delete(self, post_id, user_name):
         db = get_db()

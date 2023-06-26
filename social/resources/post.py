@@ -51,7 +51,7 @@ class PostList(Resource):
 
 
 class Post(Resource):
-    """update a post"""
+    """post owner updates their update a post"""
     @requires_post_owner()
     def patch(self, post_id):
         db = get_db()
@@ -98,7 +98,7 @@ class Post(Resource):
 
 
 class PostsFeed(Resource):
-    """generate a list of posts to whoch the logged in user is invited"""
+    """generates a list of posts to whoch the logged in user is invited"""
     @jwt_required()
     def get(self):
         page_number = request.args.get('page', default=1, type=int)

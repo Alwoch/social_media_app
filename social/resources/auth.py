@@ -19,6 +19,7 @@ class Signup(Resource):
     # TODO: ADD DOCSTRING TO ALL ENDPOINTS
     # TODO: ADD PARAMETER TYPES TO ALL ENDPOINTS DOCUMENTATION
     # TODO: ADD RETURN TYPES TO ALL ENDPOINTS DOCUMENTATION
+    """creates a new user"""
     def post(self):
         db = get_db()
         json_data = request.get_json()
@@ -55,6 +56,7 @@ class Login(Resource):
     # TODO: ADD DOCSTRING TO ALL ENDPOINTS
     # TODO: ADD PARAMETER TYPES TO ALL ENDPOINTS DOCUMENTATION
     # TODO: ADD RETURN TYPES TO ALL ENDPOINTS DOCUMENTATION
+
     """Login and attach cookies to response"""
 
     def post(self):
@@ -90,6 +92,7 @@ class Logout(Resource):
     # TODO: ADD DOCSTRING TO ALL ENDPOINTS
     # TODO: ADD PARAMETER TYPES TO ALL ENDPOINTS DOCUMENTATION
     # TODO: ADD RETURN TYPES TO ALL ENDPOINTS DOCUMENTATION
+    
     """log out and remove token from cooke"""
     @jwt_required()
     def get(self):
